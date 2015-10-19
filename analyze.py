@@ -4,7 +4,7 @@ from collections import namedtuple
 
 BEAT = 4
 SECS_MIN = 60
-TOLERENCE = 80
+TOLERANCE = 80
 
 import sys
 import select
@@ -54,7 +54,7 @@ def result(tss_ref, tss_in):
 def find_match(t, tss):
 	if not tss:
 		return None
-	if isclose(t, tss[0], abs_tol=TOLERENCE):
+	if isclose(t, tss[0], abs_tol=TOLERANCE):
 		return tss[0]
 	else:
 		find_match(t, tss[1:])
