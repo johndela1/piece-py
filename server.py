@@ -1,16 +1,16 @@
 from flask import Flask, jsonify, request
 
 import db
-from analyze import analysis, pattern_deltas, deltas_tss, reshape
+from analyze import analysis, pattern_deltas, reshape, pattern_tss, result
 
 app = Flask(__name__)
 
 @app.route('/pattern')
-@app.route('/pattern/<name>/<int:bpm>')
-def get_pattern(name=None, bpm=None):
-	if not name:
+@app.route('/pattern/<pattern_name>/<int:bpm>')
+def get_deltas(pattern_name=None, bpm=None):
+	if not pattern_name:
 		return jsonify({"patterns": db.get_patterns()})
-	pattern = db.get_pattern(name)
+	pattern = db.get_pattern(pattern_name)
 	ret = {"deltas": pattern_deltas(pattern, bpm)}
 	return jsonify(ret)
 	
@@ -18,15 +18,15 @@ def get_pattern(name=None, bpm=None):
 @app.route('/attempt', methods=['POST'])
 def set_attempt():
 	pattern_name = request.json['pattern_name']
-	in_tss = request.json['tss']
 	bpm = request.json['bpm']
+	in_tss = request.json['tss']
 	player = request.json['player']
 
 	pattern = db.get_pattern(pattern_name)
-	ref_tss = deltas_tss(pattern_deltas(pattern, bpm))
-	result = reshape(analysis(ref_tss, in_tss))
-	db.write(result, pattern_name, player, bpm)
-	return jsonify(result)
+	ref_tss = pattern_tss(pattern, bpm)
+	res = result(ref_tss, in_tss)
+	db.write(res, pattern_name, player, bpm)
+	return jsonify(res)
 
 if __name__ == '__main__':
 	app.run(debug=True)

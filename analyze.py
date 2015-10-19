@@ -4,7 +4,7 @@ from collections import namedtuple
 
 BEAT = 4
 SECS_MIN = 60
-TOLRENCE = 80
+TOLERENCE = 80
 
 import sys
 import select
@@ -37,34 +37,41 @@ def pattern_deltas(pattern, bpm):
 	acc = 0
 	ret = []
 	for note in notes:
-		if note == 0:
+		if note:
+			ret.append(acc)	
+			acc = note_duration
+		else:
 			acc += note_duration
 			continue
-		ret.append(acc)	
-		acc = note_duration
 	return ret
+
+def pattern_tss(pattern, bpm):
+	return deltas_tss(pattern_deltas(pattern, bpm))
+
+def result(tss_ref, tss_in):
+	return reshape(analysis(tss_ref, tss_in))
 
 def find_match(t, tss):
 	if not tss:
 		return None
-	if isclose(t, tss[0], abs_tol=TOLRENCE):
+	if isclose(t, tss[0], abs_tol=TOLERENCE):
 		return tss[0]
 	else:
 		find_match(t, tss[1:])
 
-def analysis(ref_tss, input_tss):
-	if not ref_tss:
-		return list(input_tss)
+def analysis(tss_ref, tss_in):
+	if not tss_ref:
+		return list(tss_in)
 
-	sample, samples = ref_tss[0], ref_tss[1:]
-	match = find_match(sample, input_tss)
+	sample, samples = tss_ref[0], tss_ref[1:]
+	match = find_match(sample, tss_in)
 
 	if match is not None:
 		return ([(sample, match - sample)] +
 			analysis(samples,
-				 [i for i in input_tss if i != match]))
+				 [i for i in tss_in if i != match]))
 	else:
-		return [(sample, None)] + analysis(samples, input_tss)
+		return [(sample, None)] + analysis(samples, tss_in)
 
 def reshape(analysis):
 	ret = {}

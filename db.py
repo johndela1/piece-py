@@ -46,8 +46,6 @@ def get_patterns():
 	return ret
 
 def write(result, pattern_name, player_name, bpm):
-# "{'result': {'missed': [3000], 'extra': [3300], 'deltas': [Delta(ts=0, diff=0), Delta(ts=1000, diff=-1), Delta(ts=2000, diff=1)]}}"
-	logging.error("result:", str(result))
 	conn = connect(dbname='notes')
 	cur = conn.cursor()
 	cur.execute(
