@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+foo = '';
+bar = '';
+deltas = [0,1000,1000,1000,1000,1000];
+deltas_len = deltas.length;
+idx = 0;
+tot_time = 0;
+prev = Date.now();
+function post(path, params, method) {
+    method = method || "post"; // Set method to post by default if not specified.
+    var form = document.createElement("form");
+    form.setAttribute("method", method);
+    form.setAttribute("action", path);
+    for(var key in params) {
+        if(params.hasOwnProperty(key)) {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", params[key]);
+
+            form.appendChild(hiddenField);
+         }
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+function next_note(delta) {
+	n =  delta / 100;
+	ret = "";
+	for (i = 0; i < n; i++)
+		ret += ".";
+	return ret + "X";
+}
+
+function startTime() {
+	if (idx > deltas_len)
+		//post('http://127.0.0.1:5000/foo', {foo: 'bar'});
+		return;
+	tot_time += deltas[idx];
+	foo += next_note(deltas[idx-1]);
+	document.getElementById('ref').innerHTML = foo;
+	var t = setTimeout(startTime, deltas[idx++]);
+}
+function note() {
+	ts = Date.now();
+	delta = ts - prev;
+	prev = ts;
+	bar += next_note(delta);
+	document.getElementById('out').innerHTML = bar;
+}
+</script>
+</head>
+
+<body onload="startTime()">
+<input type="text" onkeypress="note()">
+
+<div id="ref"></div>
+<div id="out"></div>
+
+</body>
+</html>
+
