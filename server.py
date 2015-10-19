@@ -9,7 +9,7 @@ app = Flask(__name__)
 @app.route('/pattern/<name>/<int:bpm>')
 def get_pattern(name=None, bpm=None):
 	if not name:
-		return jsonify(db.get_patterns())
+		return jsonify({"patterns": db.get_patterns()})
 	pattern = db.get_pattern(name)
 	ret = {"deltas": pattern_deltas(pattern, bpm)}
 	return jsonify(ret)

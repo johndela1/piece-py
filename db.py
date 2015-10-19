@@ -3,12 +3,12 @@ from psycopg2 import connect
 def make_schema():
 	conn = connect(dbname='notes')
 	cur = conn.cursor()
-	cur.execute("create table player (id serial primary key, name varchar)")
+	cur.execute("create table player (name varchar primary key)")
 	cur.execute("insert into player (name) values ('john')")
-	cur.execute("create table pattern (id serial primary key, name varchar, beat_div int, notes boolean[])")
+	cur.execute("create table pattern (name varchar primary key, beat_div int, notes boolean[])")
 	cur.execute("insert into pattern (name, beat_div, notes) values ('easy-4', 4, '{1,1,1,1}')")
 
-	cur.execute("create table attempt (pattern_id int, player_id int, bpm int)")
+	cur.execute("create table attempt (pattern_id varchar, player_id varchar, bpm int)")
 	cur.execute("create table delta (attempt_id int, diff int)")
 	cur.execute("create table miss (attempt_id int, ts int)")
 	cur.execute("create table extra (attempt_id int, ts int)")
@@ -35,12 +35,12 @@ def get_pattern(name):
 def get_patterns():
 	conn = connect(dbname='notes')
 	cur = conn.cursor()
-	cur.execute("select id, name from pattern")
+	cur.execute("select name from pattern")
 	rows = cur.fetchall()
 	conn.close()
-	ret = {}
+	ret = []
 	for i in rows:
-		ret[i[1]] = i[0]
+		ret.append(i[0])
 	return ret
 
 if __name__ == '__main__':
