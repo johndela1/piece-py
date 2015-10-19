@@ -11,9 +11,7 @@ def get_pattern(name=None, bpm=None):
 	if not name:
 		return jsonify(db.get_patterns())
 	pattern = db.get_pattern(name)
-	notes = pattern['notes']
-	beat_div = pattern['beat_div']
-	ret = {"deltas": pattern_deltas(beat_div, notes, bpm)}
+	ret = {"deltas": pattern_deltas(pattern, bpm)}
 	return jsonify(ret)
 	
 
@@ -22,10 +20,8 @@ def set_pattern():
 	name = request.json['name']
 	in_tss = request.json['tss']
 	bpm = request.json['bpm']
-	ref = db.get_pattern(name)  # should be namedtuple or tuple
-	beat_div = ref['beat_div']
-	notes = ref['notes']
-	ref_tss = deltas_tss(pattern_deltas(beat_div, notes, bpm))
+	pattern = db.get_pattern(name)
+	ref_tss = deltas_tss(pattern_deltas(pattern, bpm))
 	result = {'result': reshape(analysis(ref_tss, in_tss))}
 	return jsonify(result)
 

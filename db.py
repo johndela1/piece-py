@@ -26,10 +26,11 @@ def wipe():
 def get_pattern(name):
 	conn = connect(dbname='notes')
 	cur = conn.cursor()
-	cur.execute("select id, notes, beat_div from pattern where name='"+name+"'")
+	cur.execute("select beat_div, notes from pattern where name='"+name+"'")
 	row = cur.fetchall()[0]
 	conn.close()
-	return {'id': row[0], 'notes': row[1], 'beat_div': row[2]}
+	return (row[0], row[1])
+	#return {'name': row[0], 'contents': ('beat_div': row[1], 'notes': row[2])}
 
 def get_patterns():
 	conn = connect(dbname='notes')

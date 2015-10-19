@@ -29,10 +29,11 @@ def bpm_bps(bpm):
 def secs_millis(t):
 	return t * 1000
 
-def pattern_deltas(note_div, notes, bpm):
+def pattern_deltas(pattern, bpm):
 	# used when sending pattern to client
 	# pattern -> bpm => deltas
-	note_duration = int(secs_millis(BEAT / note_div) / bpm_bps(bpm))
+	beat_div, notes = pattern
+	note_duration = int(secs_millis(BEAT / beat_div) / bpm_bps(bpm))
 	acc = 0
 	ret = []
 	for note in notes:
@@ -86,7 +87,7 @@ def reshape(analysis):
 
 assert (deltas_tss([0, 500, 500]) == i_deltas_tss([0, 500, 500]) ==
 	[0, 500, 1000])
-assert pattern_deltas(4, [1, 1, 1, 1], 60) == [0, 1000, 1000, 1000]
+assert pattern_deltas((4, [1, 1, 1, 1]), 60) == [0, 1000, 1000, 1000]
 
 if __name__ == '__main__':
 #	rec = record()
