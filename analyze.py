@@ -95,11 +95,7 @@ def reshape(analysis):
 assert (deltas_tss([0, 500, 500]) == i_deltas_tss([0, 500, 500]) ==
 	[0, 500, 1000])
 assert pattern_deltas((4, [1, 1, 1, 1]), 60) == [0, 1000, 1000, 1000]
+analysis([0,100,200], [0, 101, 300])
 
 if __name__ == '__main__':
-#	rec = record()
-#	print("in: ", rec)
-#	print(analysis([0,100,200], rec))
-	
 	print(reshape(analysis([0,100,200], [0, 101, 300])))
-	print(analysis([0,100,200], [0, 101, 300]))
