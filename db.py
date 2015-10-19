@@ -1,4 +1,5 @@
 from psycopg2 import connect
+import logging
 
 def make_schema():
 	conn = connect(dbname='notes')
@@ -7,9 +8,10 @@ def make_schema():
 	cur.execute("insert into player (name) values ('john')")
 	cur.execute("create table pattern (name varchar primary key, beat_div int, notes boolean[])")
 	cur.execute("insert into pattern (name, beat_div, notes) values ('easy-4', 4, '{1,1,1,1}')")
+	cur.execute("insert into pattern (name, beat_div, notes) values ('easy-8', 8, '{1,1,1,1}')")
 
-	cur.execute("create table attempt (pattern_id varchar, player_id varchar, bpm int)")
-	cur.execute("create table delta (attempt_id int, diff int)")
+	cur.execute("create table attempt (id serial primary key, pattern_name varchar, player_name varchar, bpm int, ts timestamp with time zone)")
+	cur.execute("create table delta (attempt_id int references attempt(id), ts int, diff int)")
 	cur.execute("create table miss (attempt_id int, ts int)")
 	cur.execute("create table extra (attempt_id int, ts int)")
 	conn.commit()
@@ -43,6 +45,29 @@ def get_patterns():
 		ret.append(i[0])
 	return ret
 
+def write(result, pattern_name, player_name, bpm):
+# "{'result': {'missed': [3000], 'extra': [3300], 'deltas': [Delta(ts=0, diff=0), Delta(ts=1000, diff=-1), Delta(ts=2000, diff=1)]}}"
+	logging.error("result:", str(result))
+	conn = connect(dbname='notes')
+	cur = conn.cursor()
+	cur.execute(
+		"insert into attempt (pattern_name, player_name, bpm, ts) " +
+		"values ('{}','{}',{}, now()) returning id".format(
+			pattern_name, player_name, bpm))
+	attempt_id = cur.fetchall()[0][0]
+	for ts, diff in result['delta']:
+		cur.execute("insert into delta (attempt_id, ts, diff) values ({}, {}, {})".format(
+		attempt_id, ts, diff))
+	for ts in result['miss']:
+		cur.execute("insert into miss (attempt_id, ts) values ({}, {})".format(
+		attempt_id, ts))
+	for ts in result['extra']:
+		cur.execute("insert into extra (attempt_id, ts) values ({}, {})".format(
+		attempt_id, ts))
+	conn.commit()
+	conn.close()
+	
+			
 if __name__ == '__main__':
 	wipe()
 	make_schema()

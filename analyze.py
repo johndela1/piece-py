@@ -68,16 +68,16 @@ def analysis(ref_tss, input_tss):
 
 def reshape(analysis):
 	ret = {}
-	ret['deltas'] = []
-	ret['missed'] = []
+	ret['delta'] = []
+	ret['miss'] = []
 	ret['extra'] = []
 	Delta = namedtuple('Delta', ('ts', 'diff'))
 	for i in analysis:
 		if type(i) == tuple:
 			if i[1] is None:
-				ret['missed'].append(i[0])
+				ret['miss'].append(i[0])
 				continue
-			ret['deltas'].append(Delta(i[0], i[1]))
+			ret['delta'].append(Delta(i[0], i[1]))
 		else:
 			ret['extra'].append(i)
 	return ret

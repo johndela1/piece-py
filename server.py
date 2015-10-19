@@ -16,13 +16,16 @@ def get_pattern(name=None, bpm=None):
 	
 
 @app.route('/attempt', methods=['POST'])
-def set_pattern():
-	name = request.json['name']
+def set_attempt():
+	pattern_name = request.json['pattern_name']
 	in_tss = request.json['tss']
 	bpm = request.json['bpm']
-	pattern = db.get_pattern(name)
+	player = request.json['player']
+
+	pattern = db.get_pattern(pattern_name)
 	ref_tss = deltas_tss(pattern_deltas(pattern, bpm))
-	result = {'result': reshape(analysis(ref_tss, in_tss))}
+	result = reshape(analysis(ref_tss, in_tss))
+	db.write(result, pattern_name, player, bpm)
 	return jsonify(result)
 
 if __name__ == '__main__':
