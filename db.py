@@ -29,7 +29,7 @@ def get_pattern(name):
 	conn = connect(dbname='notes')
 	cur = conn.cursor()
 	cur.execute("select beat_div, notes from pattern where name='"+name+"'")
-	row = cur.fetchall()[0]
+	row = cur.fetchone()
 	conn.close()
 	return (row[0], row[1])
 	#return {'name': row[0], 'contents': ('beat_div': row[1], 'notes': row[2])}
@@ -40,10 +40,7 @@ def get_patterns():
 	cur.execute("select name from pattern")
 	rows = cur.fetchall()
 	conn.close()
-	ret = []
-	for i in rows:
-		ret.append(i[0])
-	return ret
+	return [rec[0] for rec in rows]
 
 def write(result, pattern_name, player_name, bpm):
 	conn = connect(dbname='notes')
@@ -52,7 +49,8 @@ def write(result, pattern_name, player_name, bpm):
 		"insert into attempt (pattern_name, player_name, bpm, ts) " +
 		"values ('{}','{}',{}, now()) returning id".format(
 			pattern_name, player_name, bpm))
-	attempt_id = cur.fetchall()[0][0]
+	#import pdb;pdb.set_trace()
+	attempt_id = cur.fetchone()[0]
 	for ts, diff in result['delta']:
 		cur.execute("insert into delta (attempt_id, ts, diff) values ({}, {}, {})".format(
 		attempt_id, ts, diff))
