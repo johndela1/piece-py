@@ -5,7 +5,7 @@
 <head>
 <script>
 
-deltas = [0,1000,1000];
+deltas = [0,1000,1000,1000];
 deltas_len = deltas.length;
 idx = 0;
 var canvas = document.getElementById("canvas");
@@ -56,7 +56,13 @@ function start() {
 window.addEventListener("keydown", dealWithKeyboard, false);
 
 function end() {
-	console.log('post to server!');
+	var obj = {};
+	obj.pattern_name='easy-4';
+	obj.player='john';
+	obj.bpm=60;
+	obj.tss=user_notes;
+	post('/attempt', obj);
+	console.log('post to server: ' +  user_notes);
 }
 user_notes = [] 
 init = 0;
@@ -64,12 +70,11 @@ function dealWithKeyboard(e) {
 	if (init == 0) {
 		init = 1;
 		base = new Date().getTime();
-		setTimeout(end, 2200);
-
+		setTimeout(end, 3400);
 	}
 	ts = new Date().getTime();
 	user_notes.push(ts - base)
-	console.log("prs: "+ user_notes);
+	console.log('ts: ' +  ts);
 }
 </script>
 </head>
