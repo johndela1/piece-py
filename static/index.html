@@ -1,14 +1,18 @@
 <!DOCTYPE html>
+<meta charset="UTF-8"> 
 <html>
+<canvas id="canvas"></canvas>
 <head>
 <script>
-foo = '';
-bar = '';
-deltas = [0,1000,1000,1000,1000,1000];
+
+deltas = [0,1000,500,1000]
 deltas_len = deltas.length;
 idx = 0;
-tot_time = 0;
-prev = Date.now();
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+
 function post(path, params, method) {
     method = method || "post"; // Set method to post by default if not specified.
     var form = document.createElement("form");
@@ -28,38 +32,29 @@ function post(path, params, method) {
     document.body.appendChild(form);
     form.submit();
 }
-function next_note(delta) {
-	n =  delta / 100;
-	ret = "";
-	for (i = 0; i < n; i++)
-		ret += ".";
-	return ret + "X";
-}
 
-function startTime() {
-	if (idx > deltas_len)
+var acc_time = 0
+function playNote() {
+	if (idx >= deltas_len) {
 		//post('http://127.0.0.1:5000/foo', {foo: 'bar'});
 		return;
-	tot_time += deltas[idx];
-	foo += next_note(deltas[idx-1]);
-	document.getElementById('ref').innerHTML = foo;
-	var t = setTimeout(startTime, deltas[idx++]);
+	}
+	var offset = (deltas[idx] + acc_time) / 20;
+	ctx.moveTo(offset, 100);
+	ctx.lineTo(offset, 200);
+	ctx.stroke();
+	acc_time += deltas[idx]
+	setTimeout(playNote, deltas[++idx]);
 }
-function note() {
-	ts = Date.now();
-	delta = ts - prev;
-	prev = ts;
-	bar += next_note(delta);
-	document.getElementById('out').innerHTML = bar;
+function start() {
+	idx = 0;
+	setTimeout(playNote, deltas[idx]);
 }
 </script>
 </head>
 
-<body onload="startTime()">
-<input type="text" onkeypress="note()">
-
-<div id="ref"></div>
-<div id="out"></div>
+<body onload="start()">
+<!-- <input type="text" onkeypress="note()"> -->
 
 </body>
 </html>
