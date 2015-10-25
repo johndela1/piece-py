@@ -5,10 +5,9 @@
 <head>
 <script>
 
-deltas = [0,1000,500,1000]
+deltas = [0,1000,1000];
 deltas_len = deltas.length;
 idx = 0;
-
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
@@ -33,22 +32,34 @@ function post(path, params, method) {
     form.submit();
 }
 
-var acc_time = 0
+var accTime = 0
 function playNote() {
 	if (idx >= deltas_len) {
 		//post('http://127.0.0.1:5000/foo', {foo: 'bar'});
+		setTimeout(start, deltas[idx-1]);
 		return;
 	}
-	var offset = (deltas[idx] + acc_time) / 20;
+	var offset = (deltas[idx] + accTime) / 20;
 	ctx.moveTo(offset, 100);
 	ctx.lineTo(offset, 200);
 	ctx.stroke();
-	acc_time += deltas[idx]
+	accTime += deltas[idx];
 	setTimeout(playNote, deltas[++idx]);
 }
 function start() {
 	idx = 0;
+	accTime = 0;
+	ctx.beginPath();
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	setTimeout(playNote, deltas[idx]);
+}
+window.addEventListener("keydown", dealWithKeyboard, false);
+
+user_notes = [] 
+function dealWithKeyboard(e) {
+	ts = new Date().getTime();
+	user_notes.push(ts)
+	console.log("prss: "+ user_notes);
 }
 </script>
 </head>
