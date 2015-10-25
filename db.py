@@ -11,9 +11,9 @@ def make_schema():
 	cur.execute("insert into pattern (name, beat_div, notes) values ('easy-8', 8, '{1,1,1,1}')")
 
 	cur.execute("create table attempt (id serial primary key, pattern_name varchar, player_name varchar, bpm int, ts timestamp with time zone)")
-	cur.execute("create table delta (attempt_id int references attempt(id), ts int, diff int)")
-	cur.execute("create table miss (attempt_id int, ts int)")
-	cur.execute("create table extra (attempt_id int, ts int)")
+	cur.execute("create table delta (id serial primary key, attempt_id int references attempt(id), ts int, diff int)")
+	cur.execute("create table miss (id serial primary key, attempt_id int, ts int)")
+	cur.execute("create table extra (id serial primary key, attempt_id int, ts int)")
 	conn.commit()
 	conn.close()
 
@@ -62,9 +62,18 @@ def write(result, pattern_name, player_name, bpm):
 		attempt_id, ts))
 	conn.commit()
 	conn.close()
-	
+
+def get_all_for_pattern(name):
+	conn = connect(dbname='notes')
+	cur = conn.cursor()
+	cur.execute("select ts, diff from delta where attempt_id in (select id from attempt where pattern_name='{}')".format(name))
+	rs = cur.fetchall()
+	print(rs)
 			
 if __name__ == '__main__':
 	wipe()
 	make_schema()
-	print(get_pattern('easy-4'))
+	#print(get_all_for_pattern('easy-4'))
+
+#calc which  timestamps per pattern are difficult
+#fin note in song with the most errors
