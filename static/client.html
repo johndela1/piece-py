@@ -55,11 +55,21 @@ function start() {
 }
 window.addEventListener("keydown", dealWithKeyboard, false);
 
+function end() {
+	console.log('post to server!');
+}
 user_notes = [] 
+init = 0;
 function dealWithKeyboard(e) {
+	if (init == 0) {
+		init = 1;
+		base = new Date().getTime();
+		setTimeout(end, 2200);
+
+	}
 	ts = new Date().getTime();
-	user_notes.push(ts)
-	console.log("prss: "+ user_notes);
+	user_notes.push(ts - base)
+	console.log("prs: "+ user_notes);
 }
 </script>
 </head>
