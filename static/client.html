@@ -7,7 +7,7 @@
 
 var patternName = 'easy-4';
 bpm = 60;
-player = 'john';
+player = 'anonymous';
 deltas = [0,1000,1000,1000];
 deltas_len = deltas.length;
 idx = 0;
@@ -24,6 +24,8 @@ function changePattern(form) {
 			idx = 0;
 			deltas = JSON.parse(oReq.responseText)['deltas'];
 			deltas_len = deltas.length;
+			bpm = form.bpm.value;
+			reset();
 		});
 	oReq.open("GET", "/pattern/"+patternName+"/"+bpm);
 	oReq.send();
@@ -64,13 +66,18 @@ function playNote() {
 	accTime += deltas[idx];
 	setTimeout(playNote, deltas[++idx]);
 }
-function start() {
+function reset() {
 	idx = 0;
 	accTime = 0;
 	ctx.beginPath();
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function start() {
+	reset();
 	setTimeout(playNote, deltas[idx]);
 }
+
 window.addEventListener("keydown", dealWithKeyboard, false);
 
 function end() {
@@ -103,7 +110,9 @@ function showPatterns() {
 	oReq.addEventListener("load", 
 		function () {
 			patterns = JSON.parse(oReq.responseText)['patterns'];
-			document.getElementById('out').innerHTML = patterns;
+			document.getElementById('pattern').innerHTML = patterns;
+			document.getElementById("bpm").value=bpm;
+			document.getElementById("player").value=player;
 		});
 	oReq.open("GET", "/pattern");
 	oReq.send();
@@ -114,12 +123,14 @@ showPatterns();
 
 <body onload="start()">
 <form name="myform" action="" method="get">choose a pattern: <br>
-<input type="text" name="name" value=""><p>
+pattern: <input id="pattern" type="text" name="name" value=""><p>
+bpm: <input id="bpm" type="text" name="bpm" value=""><p>
+bpm: <input id="player" type="text" name="player" value=""><p>
 <input type="button" name="button" value="click" onClick="changePattern(this.form)">
 </form>
 <br>
 available patterns: 
-<div id="out"></div>
+<div id="pattern"></div>
 </body>
 </html>
 
