@@ -85,6 +85,10 @@ function end() {
 user_notes = [] 
 init = 0;
 function dealWithKeyboard(e) {
+	console.log('code: ' + e.keyCode);
+	//if !(e.keyCode === 0 || e.keyCode === 32)
+	if (e.keyCode != 32)
+		return;
 	if (init == 0) {
 		init = 1;
 		base = new Date().getTime();
@@ -94,23 +98,28 @@ function dealWithKeyboard(e) {
 	user_notes.push(ts - base)
 	console.log('ts: ' +  ts);
 }
+function showPatterns() {
+ 	oReq = new XMLHttpRequest();
+	oReq.addEventListener("load", 
+		function () {
+			patterns = JSON.parse(oReq.responseText)['patterns'];
+			document.getElementById('out').innerHTML = patterns;
+		});
+	oReq.open("GET", "/pattern");
+	oReq.send();
+}
+showPatterns();
 </script>
 </head>
 
 <body onload="start()">
-<!-- <input type="text" onkeypress="note()"> -->
-<!-- <input type="text" onkeypress="note()"> -->
-<!--
-<form action="#" onsubmit="changePattern(this.form)">
-    <input type="text" name="name" />
+<form name="myform" action="" method="get">choose a pattern: <br>
+<input type="text" name="name" value=""><p>
+<input type="button" name="button" value="click" onClick="changePattern(this.form)">
 </form>
--->
-<FORM NAME="myform" ACTION="" METHOD="GET">Enter something in the box: <BR>
-<INPUT TYPE="text" NAME="name" VALUE=""><P>
-<INPUT TYPE="button" NAME="button" Value="Click" onClick="changePattern(this.form)">
-</FORM>
-
-
+<br>
+available patterns: 
+<div id="out"></div>
 </body>
 </html>
 
