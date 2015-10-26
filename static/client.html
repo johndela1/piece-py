@@ -15,6 +15,11 @@ idx = 0;
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
+function totalLen(dts) {
+	return dts.reduce(function(a, b) {
+	  return a + b;
+	});
+}
 function changePattern(form) {
     	patternName = form.name.value;
 
@@ -91,7 +96,7 @@ function end() {
 	obj.tss=user_notes;
 	post('/attempt', obj);
 }
-user_notes = [] 
+user_notes = [];
 init = 0;
 function dealWithKeyboard(e) {
 	if (e.keyCode != 32)
@@ -99,7 +104,7 @@ function dealWithKeyboard(e) {
 	if (init == 0) {
 		init = 1;
 		base = new Date().getTime();
-		setTimeout(end, 3400);
+		setTimeout(end, totalLen(deltas)+500);
 	}
 	ts = new Date().getTime();
 	user_notes.push(ts - base)
@@ -122,7 +127,7 @@ showPatterns();
 </head>
 
 <body onload="start()">
-<form name="myform" action="" method="get">choose a pattern: <br>
+<form name="myform" action="" method="get"><h2>choose a pattern, then tap along with spacebar</h2><br>
 pattern: <input id="pattern" type="text" name="name" value=""><p>
 bpm: <input id="bpm" type="text" name="bpm" value=""><p>
 player: <input id="player" type="text" name="player" value=""><p>
