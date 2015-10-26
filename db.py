@@ -8,7 +8,7 @@ def make_schema():
 	cur.execute("insert into player (name) values ('john')")
 	cur.execute("create table pattern (name varchar primary key, beat_div int, notes boolean[])")
 	cur.execute("insert into pattern (name, beat_div, notes) values ('easy-4', 4, '{1,1,1,1}')")
-	cur.execute("insert into pattern (name, beat_div, notes) values ('easy-8', 8, '{1,1,1,1}')")
+	cur.execute("insert into pattern (name, beat_div, notes) values ('easy-8', 8, '{1,1,1,1,1,1,1,1}')")
 	cur.execute("insert into pattern (name, beat_div, notes) values ('12123', 12, '{1,0,0,1,0,0,1,0,1,0,1,0}')")
 
 	cur.execute("create table attempt (id serial primary key, pattern_name varchar, player_name varchar, bpm int, ts timestamp with time zone)")
