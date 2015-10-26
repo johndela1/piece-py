@@ -5,12 +5,30 @@
 <head>
 <script>
 
+var patternName = 'easy-4';
+bpm = 60;
+player = 'john';
 deltas = [0,1000,1000,1000];
 deltas_len = deltas.length;
 idx = 0;
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
+function changePattern(form) {
+    	patternName = form.name.value;
+	console.log("name: "+patternName);
+
+ 	oReq = new XMLHttpRequest();
+	oReq.addEventListener("load", 
+		function () {
+			idx = 0;
+			deltas = JSON.parse(oReq.responseText)['deltas'];
+			deltas_len = deltas.length;
+		});
+	oReq.open("GET", "/pattern/"+patternName+"/"+bpm);
+	oReq.send();
+	return false;
+}
 
 function post(path, params, method) {
     method = method || "post"; // Set method to post by default if not specified.
@@ -81,6 +99,17 @@ function dealWithKeyboard(e) {
 
 <body onload="start()">
 <!-- <input type="text" onkeypress="note()"> -->
+<!-- <input type="text" onkeypress="note()"> -->
+<!--
+<form action="#" onsubmit="changePattern(this.form)">
+    <input type="text" name="name" />
+</form>
+-->
+<FORM NAME="myform" ACTION="" METHOD="GET">Enter something in the box: <BR>
+<INPUT TYPE="text" NAME="name" VALUE=""><P>
+<INPUT TYPE="button" NAME="button" Value="Click" onClick="changePattern(this.form)">
+</FORM>
+
 
 </body>
 </html>
