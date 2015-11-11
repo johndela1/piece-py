@@ -1,6 +1,10 @@
 from flask import Flask, jsonify, request
 
-import db
+try:
+    import db
+except ImportError:
+    import stub as db
+
 from analyze import analysis, pattern_deltas, reshape, pattern_tss, result
 
 app = Flask(__name__)
