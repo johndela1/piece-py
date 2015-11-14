@@ -2,7 +2,7 @@ from cmath import isclose
 from time import time
 from collections import namedtuple
 
-BEAT = 4
+BEATS_PER_MEASURE = 4
 SECS_MIN = 60
 TOLERANCE = 80
 
@@ -33,7 +33,7 @@ def pattern_deltas(pattern, bpm):
 	# used when sending pattern to client
 	# pattern -> bpm => deltas
 	beat_div, notes = pattern
-	note_duration = int(secs_millis(BEAT / beat_div) / bpm_bps(bpm))
+	note_duration = int(secs_millis(BEATS_PER_MEASURE / beat_div) / bpm_bps(bpm))
 	acc = 0
 	ret = []
 	for note in notes:
