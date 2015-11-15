@@ -3,7 +3,7 @@ from time import time
 from collections import namedtuple
 
 BEATS_PER_MEASURE = 4
-SECS_MIN = 60
+SECS_PER_MINUTE = 60
 TOLERANCE = 80
 
 import sys
@@ -24,7 +24,7 @@ def i_deltas_tss(deltas):
 	return ret
 
 def bpm_bps(bpm):
-	return bpm / SECS_MIN
+	return bpm / SECS_PER_MINUTE
 
 def secs_millis(t):
 	return t * 1000
@@ -117,17 +117,37 @@ def easier(pattern, patterns):
         else:
             low = mid+1
 
+def p_t(piece):
+    (beats, beat_div), bpm, notes = piece
+    for i, note in enumerate(notes):
+        subdivs = len(note)
+        ts = i * secs_millis((beats / bpm_bps(bpm)) / beat_div)
+        for sub in range(subdivs):
+            if note[sub]: yield ts
+            ts += ts / subdivs
+
+def p_d(piece):
+    (beats, beat_div), bpm, notes = piece
+    acc = 0
+    for note_group in notes:
+        subdivs = len(note_group)
+        note_duration = secs_millis(SECS_PER_MINUTE / bpm) / subdivs
+        for sub in range(subdivs):
+            if note_group[sub]:
+                yield acc
+                acc = note_duration
+                continue
+            acc += note_duration
+
 if __name__ == '__main__':
 	#print(reshape(analysis([0,100,200], [0, 101, 300])))
     tss_ref=[0,500,1000]
     tss_in=[10,450,1300]
-    print(trial(tss_ref, tss_in))
-    tss_in=[0,500,1080]
-    print(trial(tss_ref, tss_in))
 
-
-    patterns = [(div, bpm, int(div/4)) for div in (4,8) for bpm in range(60,121,10)]
-    print (str(dict(patterns = patterns)))
-    tss_in=(4,100,1)
-    print('input:', tss_in)
-    print(easier((4,100,1), patterns))
+    Piece = namedtuple('Piece', ('meter', 'bpm', 'notes'))
+    piece = Piece((4,4), 60, ([1], [1,1], [1], [1]))
+    print ("hey 60:",piece,"\n", list(p_d(piece)))
+    piece = Piece((4,4), 120, ([1], [1,1], [1], [1]))
+    piece = Piece((4,4), 120, ((1,), (1,1), (1,), (1,)))
+    print ("hey 120:",piece,"\n", list(p_d(piece)))
+#[Piece((4,4), bpm,[[1]*subdiv]*4) for subdiv in [1,2]for bpm in range(60,121,10)]
