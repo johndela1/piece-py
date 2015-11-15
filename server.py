@@ -1,9 +1,9 @@
 from flask import Flask, jsonify, request
 
-try:
-    import db
-except ImportError:
-    import stub as db
+#try:
+#    import db
+#except ImportError:
+import stub as db
 
 from analyze import analysis, pattern_deltas, reshape, pattern_tss, result
 
@@ -17,7 +17,6 @@ def get_deltas(pattern_name=None, bpm=None):
 	pattern = db.get_pattern(pattern_name)
 	ret = {"deltas": pattern_deltas(pattern, bpm)}
 	return jsonify(ret)
-	
 
 @app.route('/attempt', methods=['POST'])
 def post_attempt():
@@ -31,6 +30,7 @@ def post_attempt():
 	res = result(ref_tss, in_tss)
 	db.write(res, pattern_name, player, bpm)
 	return str(res)+'<br><a href=http://127.0.0.1:5000/static/client.html>back</a>'
+
 
 if __name__ == '__main__':
 	app.run(debug=True)
