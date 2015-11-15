@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<meta charset="UTF-8"> 
+<html>
+<canvas id="canvas"></canvas>
+<head>
+<script>
+
+TOLERANCE = 100;
+BEATS_PER_MEASURE = 4;
+SECS_PER_MIN = 60;
+piece = null;
+deltas = null;
+idx = 0;
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+function bpm_bps(bpm) {
+    return bpm / SECS_MIN;
+}
+
+function secs_millis(secs) {
+    return secs * 1000;
+}
+
+function pieces() {
+    ret = [];
+    var subdivs = [1,2];
+    for (var i = 0; i < subdivs.length; i++) {
+        div = subdivs[i];
+        for (var bpm = 60; bpm <= 120; bpm++) {
+            ret.push([[4,4], bpm,
+                Array.from(Array(4)).map(() => (Array.from(Array(div)).map(() => 1)))]);
+        }
+    }
+    return ret;
+}
+
+function cmp(x, y) {
+    return x[1] * x[2][0].length - y[1] * y[2][0].length
+}
+
+function foo(piece, pieces, shift_func) {
+    low = 0;
+    high = pieces.length - 1;
+    while (low < high) {
+        mid = (low + high) >> 1;
+        diff = cmp(piece, pieces[mid]);
+        if (diff == 0)
+            return pieces[shift_func(mid, pieces.length - 0)];
+        else if (diff < 0)
+            high = mid -1;
+        else
+            low = mid + 1;
+    }
+    return -1;
+}
+function easier(piece, pieces) {
+    return foo(piece, pieces, function(mid, _) {return mid >> 1;});
+}
+function harder(piece, pieces) {
+    return foo(piece, pieces, function(mid, high) {return (mid + high) >> 1;});
+}
+
+function totalLen(dts) {
+	return dts.reduce(function(a, b) {
+	  return a + b;
+	});
+}
+function changePattern(form) {
+    patternName = form.name.value;
+
+	oReq = new XMLHttpRequest();
+	oReq.addEventListener("load",
+		function () {
+			idx = 0;
+			deltas = JSON.parse(oReq.responseText)['deltas'];
+			deltas_len = deltas.length;
+			bpm = form.bpm.value;
+			idx = -1;
+		});
+	oReq.open("GET", "/pattern/"+patternName+"/"+form.bpm.value);
+	oReq.send();
+	return false;
+}
+
+function post(path, params, method) {
+    method = method || "post"; // Set method to post by default if not specified.
+    var form = document.createElement("form");
+    form.setAttribute("method", method);
+    form.setAttribute("action", path);
+    for(var key in params) {
+        if(params.hasOwnProperty(key)) {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", params[key]);
+
+            form.appendChild(hiddenField);
+         }
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+var accTime = 0;
+function playNote() {
+	if (idx == -1){
+		setTimeout(start, 0);
+		return;
+    }
+	if (idx >=deltas.length) {
+		setTimeout(start, deltas[idx-1]);
+		return;
+	}
+	var offset = (deltas[idx] + accTime) / 20;
+	ctx.moveTo(offset, 100);
+	ctx.lineTo(offset, 200);
+	ctx.stroke();
+	accTime += deltas[idx];
+	setTimeout(playNote, deltas[++idx]);
+}
+function reset() {
+	idx = 0;
+	accTime = 0;
+	ctx.beginPath();
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+function get_deltas(piece) {
+    [[beats, beat_div], bpm, notes] = piece
+    ret = [];
+    acc = 0;
+    for (var i = 0; i < notes.length; i++) {
+        note_group = notes[i];
+        subdivs = note_group.length;
+        note_duration = secs_millis(SECS_PER_MIN / bpm) / subdivs;
+        for (var sub = 0; sub < subdivs; sub++) {
+            if (note_group[sub] == 1) {
+                ret.push(acc);
+                acc = note_duration;
+                continue;
+            }
+            acc += note_duration;
+        }
+    }
+    return ret
+}
+
+function start() {
+    console.log("start");
+    ps = pieces();
+    piece = ps[(ps.length >> 1) - 1];
+    deltas = get_deltas(piece);
+    console.log("first deltas", deltas);
+    console.log("first piece", piece);
+    //for (var i = 0; i < 122; i++)
+     //   console.log( ps[i][0], ps[i][1], ps[i][2]);
+
+	reset();
+    console.log('first sleep: ',deltas[0]);
+	setTimeout(playNote, deltas[0]);
+}
+
+window.addEventListener("keydown", dealWithKeyboard, false);
+
+//function trial(tss_ref, tss_in):
+ //   return (tss_ref.length == tss_in.length) and
+  //      not any(map(lambda x: abs(x) > TOLERANCE,
+   //             [ts_ref - ts_in for ts_ref, ts_in in zip(tss_ref, tss_in)])))
+function trial(tss_ref, tss_in) {
+    if (tss_ref.length != tss_in.length) return false;
+    len = tss_ref.length;
+    for (var i = 0; i < len; i++) {
+        if (abs(tss_ref[i] - tss_ref[i]) > TOLERANCE)
+            return false;
+    }
+    return true;
+}
+
+function end() {
+	//var obj = {};
+	//obj.pattern_name=patternName
+	//obj.player=player
+	//obj.bpm=bpm
+	//obj.tss=user_notes;
+	//post('/attempt', obj);
+    //res = trial(deltas, deltas); 
+
+}
+user_notes = [];
+init = 0;
+function dealWithKeyboard(e) {
+	if (e.keyCode != 32)
+		return;
+	if (init == 0) {
+		init = 1;
+		base = new Date().getTime();
+		setTimeout(end, totalLen(deltas)+500);
+	}
+	ts = new Date().getTime();
+	user_notes.push(ts - base)
+}
+</script>
+</head>
+
+<h2>tap along with spacebar</h2><br>
+<body onload="start()">
+
+<form name="myform" action="" method="get"><h2>choose a pattern, then tap along with spacebar</h2><br>
+pattern: <input id="pattern" type="text" name="name" value=""><p>
+bpm: <input id="bpm" type="text" name="bpm" value=""><p>
+player: <input id="player" type="text" name="player" value=""><p>
+<input type="button" name="button" value="click" onClick="changePattern(this.form)">
+</form>
+<br>
+</body>
+</html>
