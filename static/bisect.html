@@ -177,6 +177,13 @@ function trial(tss_ref, tss_in) {
     return true;
 }
 
+function deltas_tss(deltas, acc_time=0) {
+	if (not deltas)
+		return [];
+	ts = acc_time + deltas[0];
+	return [ts] + deltas_tss(deltas[1:], ts);
+}
+
 function end() {
 	//var obj = {};
 	//obj.pattern_name=patternName
@@ -184,7 +191,8 @@ function end() {
 	//obj.bpm=bpm
 	//obj.tss=user_notes;
 	//post('/attempt', obj);
-    //res = trial(deltas, deltas); 
+    res = trial(deltas_tss(deltas), deltas_tss(user_notes));
+    console.log('trial', res);
 
 }
 user_notes = [];
