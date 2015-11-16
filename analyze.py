@@ -13,7 +13,7 @@ def deltas_tss(deltas, acc_time=0):
 	if not deltas:
 		return []
 	ts = acc_time + deltas[0]
-	return list([ts] + (deltas_tss(deltas[1:], ts)))
+	return [ts] + deltas_tss(deltas[1:], ts)
 
 def i_deltas_tss(deltas):
 	ret = []
