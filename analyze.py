@@ -1,28 +1,14 @@
 from cmath import isclose
-from time import time
 from collections import namedtuple
+from itertools import accumulate
 
-BEATS_PER_MEASURE = 4
 SECS_PER_MINUTE = 60
 TOLERANCE = 80
 
-import sys
-import select
 
-def deltas_tss(deltas, acc_time=0):
-	if not deltas:
-		return []
-	ts = acc_time + deltas[0]
-	return [ts] + deltas_tss(deltas[1:], ts)
-
-def i_deltas_tss(deltas):
-	ret = []
-	acc = 0
-	for delta in deltas:
-		ret.append(delta + acc)
-		acc += delta
-	return ret
-
+def deltas_tss(deltas):
+        yield from accumulate(deltas)
+        
 def bpm_bps(bpm):
 	return bpm / SECS_PER_MINUTE
 
@@ -32,8 +18,8 @@ def secs_millis(t):
 def pattern_deltas(pattern, bpm):
 	# used when sending pattern to client
 	# pattern -> bpm => deltas
-	beat_div, notes = pattern
-	note_duration = int(secs_millis(BEATS_PER_MEASURE / beat_div) / bpm_bps(bpm))
+	(beats, beat_unit), notes = pattern
+	note_duration = int(secs_millis(beat_unit / beats) / bpm_bps(bpm))
 	acc = 0
 	ret = []
 	for note in notes:
@@ -96,9 +82,8 @@ def reshape(analysis):
 
 ##########################################
 
-assert (deltas_tss([0, 500, 500]) == i_deltas_tss([0, 500, 500]) ==
-	[0, 500, 1000])
-assert pattern_deltas((4, [1, 1, 1, 1]), 60) == [0, 1000, 1000, 1000]
+assert (list(deltas_tss([0, 500, 500])) == [0, 500, 1000])
+assert pattern_deltas(((4, 4), [1, 1, 1, 1]), 60) == [0, 1000, 1000, 1000]
 analysis([0,100,200], [0, 101, 300])
 
 def cmp(x, y):
@@ -143,11 +128,14 @@ if __name__ == '__main__':
 	#print(reshape(analysis([0,100,200], [0, 101, 300])))
     tss_ref=[0,500,1000]
     tss_in=[10,450,1300]
+ 
+#    import pdb;pdb.set_trace()
+    print('pass')
+    # beats/beat_unit
+    Pattern = namedtuple('Pattern', ('sig', 'bpm', 'notes'))
+    pattern = Pattern((4,4), 60, [[1], [1,1], [1], [1]])
+    print ("hey 60:",pattern,"\n", list(p_d(pattern)))
 
-    Piece = namedtuple('Piece', ('meter', 'bpm', 'notes'))
-    piece = Piece((4,4), 60, ([1], [1,1], [1], [1]))
-    print ("hey 60:",piece,"\n", list(p_d(piece)))
-    piece = Piece((4,4), 120, ([1], [1,1], [1], [1]))
-    piece = Piece((4,4), 120, ((1,), (1,1), (1,), (1,)))
-    print ("hey 120:",piece,"\n", list(p_d(piece)))
-#[Piece((4,4), bpm,[[1]*subdiv]*4) for subdiv in [1,2]for bpm in range(60,121,10)]
+    pattern = Pattern((4,4), 120, [[1], [1,1], [1], [1]])
+    print ("hey 120:",pattern,"\n", list(p_d(pattern)))
+#[Pattern((4,4), bpm,[[1]*subdiv]*4) for subdiv in [1,2]for bpm in range(60,121,10)]
