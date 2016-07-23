@@ -45,18 +45,17 @@ def good_match(ts, tss):
 
 
 def analysis(tss_ref, tss_in):
-    ret = []
+    deltas = []
     missing = []
-    tss_remaining = copy(tss_in)
+    tss_in_remaining = copy(tss_in)
     for ts_ref in tss_ref:
-        match = good_match(ts_ref, tss_remaining)
-        if match is None:
+        ts_in = good_match(ts_ref, tss_in_remaining)
+        if ts_in is None:
             missing.append(ts_ref)
         else:
-            err = match - ts_ref
-            tss_remaining.remove(match)
-            ret.append((ts_ref, err))
-    return dict(delta=ret, miss=missing, extra=tss_remaining)
+            deltas.append((ts_ref, (ts_in - ts_ref)))
+            tss_in_remaining.remove(ts_in)
+    return dict(deltas=deltas, misses=missing, extras=tss_in_remaining)
 
 
 def trial(tss_ref, tss_in):
