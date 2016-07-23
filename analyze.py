@@ -40,25 +40,21 @@ def pattern_tss(pattern, bpm):
     return deltas_tss(pattern_deltas(pattern, bpm))
 
 
-def best_match(t, tss):
-    if not tss:
-        return None
-    if isclose(t, tss[0], abs_tol=TOLERANCE):
-        return tss[0]
-    else:
-        return best_match(t, tss[1:])
+def good_match(ts, tss):
+    return next((x for x in tss if isclose(ts, x, abs_tol=TOLERANCE)),  None)
 
 
 def analysis(tss_ref, tss_in):
     ret = []
     tss_remaining = copy(tss_in)
     for ts_ref in tss_ref:
-        match = best_match(ts_ref, tss_remaining)
+        match = good_match(ts_ref, tss_remaining)
         if match is None:
-            ret.append((ts_ref, None))
+            err = None
         else:
-            ret.append((ts_ref, match - ts_ref))
+            err = match - ts_ref
             tss_remaining.remove(match)
+        ret.append((ts_ref, err))
     ret += tss_remaining
     return ret
 
