@@ -46,17 +46,17 @@ def good_match(ts, tss):
 
 def analysis(tss_ref, tss_in):
     ret = []
+    missing = []
     tss_remaining = copy(tss_in)
     for ts_ref in tss_ref:
         match = good_match(ts_ref, tss_remaining)
         if match is None:
-            err = None
+            missing.append(ts_ref)
         else:
             err = match - ts_ref
             tss_remaining.remove(match)
-        ret.append((ts_ref, err))
-    ret += tss_remaining
-    return ret
+            ret.append((ts_ref, err))
+    return dict(delta=ret, miss=missing, extra=tss_remaining)
 
 
 def trial(tss_ref, tss_in):
@@ -65,24 +65,7 @@ def trial(tss_ref, tss_in):
                 [ts_ref - ts_in for ts_ref, ts_in in zip(tss_ref, tss_in)])))
 
 
-def reshape(analysis):
-    ret = {}
-    ret['delta'] = []
-    ret['miss'] = []
-    ret['extra'] = []
-    Delta = namedtuple('Delta', ('ts', 'diff'))
-    for i in analysis:
-        if type(i) == tuple:
-            if i[1] is None:
-                ret['miss'].append(i[0])
-                continue
-            ret['delta'].append(Delta(i[0], i[1]))
-        else:
-            ret['extra'].append(i)
-    return ret
-
 ##########################################
-
 
 
 def easier(pattern, patterns):
@@ -126,12 +109,13 @@ def p_d(pattern):
 
 if __name__ == '__main__':
     Pattern = namedtuple('Pattern', ('sig', 'bpm', 'notes'))
-    pattern = Pattern((4, 4), 60, [[1], [1, 1], [1], [1]])
-    print(pattern, "\n", list(p_d(pattern)), list(p_t(pattern)))
 
-    tss_ref=[0,500,1000,2500]
-    tss_in=[10,470,1000,2700]
-    x = reshape(analysis(tss_ref, tss_in))
-    print("result:", x)
-    print(reshape(analysis([0,100,200], [0, 101, 300])))
-    print('pass')
+    # pattern = Pattern((4, 4), 60, [[1], [1, 1], [1], [1]])
+    # print(list(p_t(pattern)))
+
+    tss_ref=[0,500,1000,2500,10000]
+    tss_in=[10,470,1000,2700, 2800, 240]
+    a = analysis(tss_ref, tss_in)
+    print("analysis:", a)
+    #print(analysis([0,100,200], [0, 101, 300])))
+
