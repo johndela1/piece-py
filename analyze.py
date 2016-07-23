@@ -16,24 +16,23 @@ def deltas_tss(deltas):
 def bpm_bps(bpm):
     return bpm / SECS_PER_MINUTE
 
+
 def secs_millis(t):
     return t * 1000
 
+
 def pattern_deltas(pattern, bpm):
-    # used when sending pattern to client
-    # pattern -> bpm => deltas
     (beats, beat_unit), notes = pattern
     note_duration = int(secs_millis(beat_unit / beats) / bpm_bps(bpm))
     acc = 0
-    ret = []
+    deltas = []
     for note in notes:
         if note:
-            ret.append(acc)	
+            deltas.append(acc)	
             acc = note_duration
         else:
             acc += note_duration
-            continue
-    return ret
+    return deltas
 
 
 def pattern_tss(pattern, bpm):
