@@ -40,7 +40,8 @@ def pattern_tss(pattern, bpm):
 
 
 def good_match(ts, tss):
-    return next((x for x in tss if isclose(ts, x, abs_tol=TOLERANCE)),  None)
+    return next(
+        (x for x in tss if isclose(ts, x, abs_tol=TOLERANCE)), None)
 
 
 def analysis(tss_ref, tss_in):
@@ -83,11 +84,10 @@ def reshape(analysis):
 ##########################################
 
 
-def cmp(x, y):
-    return x[0]*x[1] - y[0]*y[1]
-
 
 def easier(pattern, patterns):
+    def cmp(x, y):
+        return x[0]*x[1] - y[0]*y[1]
     low = 0
     hi = len(patterns) - 1
     while low < hi:
@@ -101,8 +101,8 @@ def easier(pattern, patterns):
             low = mid+1
 
 
-def p_t(piece):
-    (beats, beat_div), bpm, notes = piece
+def p_t(pattern):
+    (beats, beat_div), bpm, notes = pattern
     for i, note in enumerate(notes):
         subdivs = len(note)
         ts = i * secs_millis((beats / bpm_bps(bpm)) / beat_div)
@@ -110,8 +110,8 @@ def p_t(piece):
             if note[sub]: yield int(ts)
             ts += ts / subdivs
 
-def p_d(piece):
-    (beats, beat_div), bpm, notes = piece
+def p_d(pattern):
+    (beats, beat_div), bpm, notes = pattern
     acc = 0
     for note_group in notes:
         subdivs = len(note_group)
