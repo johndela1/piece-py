@@ -1,5 +1,6 @@
-from analyze import analysis
-from db2 import *
+from analyze import  Pattern, p_tss
+import analyze
+from db2 import Delta, Extra, Miss, session
 
 
 def write(a):
@@ -11,11 +12,11 @@ def write(a):
     session.add(attempt)
     session.flush()
 
+def pattern(name, bpm):
+    return Pattern((4, 4), bpm, [[1], [1], [1], [1]])
 
+
+def analysis(pattern, tss_in):
+    return analyze.analysis(p_tss(pattern), tss_in)
 if __name__ == '__main__':
-    tss_ref=[0,500,1000,2500,10000]
-    tss_in=[10,470,1000,2700, 2800, 240]
-    write(analysis(tss_ref, tss_in))
-    session.commit()
-
     import pdb;pdb.set_trace()
