@@ -95,7 +95,8 @@ def p_tss(pattern):
             if note[sub]: yield int(ts)
             ts += note_duration / subdivs
 
-def p_dt(pattern):
+
+def p_dts(pattern):
     (beats, beat_unit), bpm, notes = pattern
     acc = 0
     for note_group in notes:

@@ -1,4 +1,6 @@
-from analyze import  Pattern, p_tss
+from itertools import chain
+
+from analyze import  Pattern, p_tss, p_dts
 import analyze
 from db2 import Delta, Extra, Miss, session
 
@@ -12,11 +14,21 @@ def write(a):
     session.add(attempt)
     session.flush()
 
-def pattern(name, bpm):
+
+def get_pattern(name, bpm):
     return Pattern((4, 4), bpm, [[1], [1], [1], [1]])
 
 
-def analysis(pattern, tss_in):
-    return analyze.analysis(p_tss(pattern), tss_in)
+def deltas_with_note_count(name, bpm):
+    pattern = get_pattern(name, bpm)
+    return p_dts(pattern), len(list(chain(*pattern.notes)))
+
+
+def submit(name, bpm, tss_in):
+    pattern = get_pattern(name, bpm)
+    tss_ref = p_tss(pattern)
+    return analyze.analysis(tss_ref, tss_in)
+
+
 if __name__ == '__main__':
     import pdb;pdb.set_trace()
