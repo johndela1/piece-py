@@ -5,7 +5,7 @@ from collections import namedtuple
 from copy import copy
 from itertools import accumulate
 
-SECS_PER_MINUTE = 60
+SECS_PER_MIN = 60
 TOLERANCE = 80
 
 
@@ -14,7 +14,7 @@ def deltas_tss(deltas):
 
 
 def bpm_bps(bpm):
-    return bpm / SECS_PER_MINUTE
+    return bpm / SECS_PER_MIN
 
 
 def secs_millis(t):
@@ -84,20 +84,23 @@ def easier(pattern, patterns):
 
 
 def p_t(pattern):
-    (beats, beat_div), bpm, notes = pattern
+    (beats, beat_unit), bpm, notes = pattern
     for i, note in enumerate(notes):
         subdivs = len(note)
-        ts = i * secs_millis((beats / bpm_bps(bpm)) / beat_div)
+        period = beat_unit*1000*SECS_PER_MIN / (bpm*beats)
+        note_duration = int(secs_millis(beat_unit / beats) / bpm_bps(bpm))
+        assert  period == note_duration
+        ts = i * secs_millis((beats / bpm_bps(bpm)) / beat_unit)
         for sub in range(subdivs):
             if note[sub]: yield int(ts)
-            ts += ts / subdivs
+            ts += note_duration / subdivs
 
 def p_d(pattern):
-    (beats, beat_div), bpm, notes = pattern
+    (beats, beat_unit), bpm, notes = pattern
     acc = 0
     for note_group in notes:
         subdivs = len(note_group)
-        note_duration = secs_millis(SECS_PER_MINUTE / bpm) / subdivs
+        note_duration = secs_millis(SECS_PER_MIN / bpm) / subdivs
         for sub in range(subdivs):
             if note_group[sub]:
                 yield acc
@@ -108,13 +111,13 @@ def p_d(pattern):
 
 if __name__ == '__main__':
     Pattern = namedtuple('Pattern', ('sig', 'bpm', 'notes'))
-
-    # pattern = Pattern((4, 4), 60, [[1], [1, 1], [1], [1]])
-    # print(list(p_t(pattern)))
-
-    tss_ref=[0,500,1000,2500,10000]
-    tss_in=[10,470,1000,2700, 2800, 240]
-    a = analysis(tss_ref, tss_in)
-    print("analysis:", a)
-    #print(analysis([0,100,200], [0, 101, 300])))
-
+    pattern = Pattern((4, 4), 60, [[1, 1], [1], [1], [1]])
+    print(list(p_t(pattern)))
+    assert((list(p_t(pattern))) == [0, 500, 1000, 2000, 3000])
+    pattern = Pattern((4, 4), 60, [[1, 1, 1], [1], [1], [1]])
+    print(list(p_t(pattern)))
+    assert((list(p_t(pattern))) == [0, 333, 666, 1000, 2000, 3000])
+    pattern = Pattern((4, 4), 60, [[1, 1], [1, 1, 1], [1, 1], [1, 1, 1]])
+    print(list(p_t(pattern)))
+    assert((list(p_t(pattern))) ==
+           [0, 500, 1000, 1333, 1666, 2000, 2500, 3000, 3333, 3666])
