@@ -83,7 +83,7 @@ def easier(pattern, patterns):
             low = mid+1
 
 
-def p_t(pattern):
+def p_tss(pattern):
     (beats, beat_unit), bpm, notes = pattern
     for i, note in enumerate(notes):
         subdivs = len(note)
@@ -95,7 +95,7 @@ def p_t(pattern):
             if note[sub]: yield int(ts)
             ts += note_duration / subdivs
 
-def p_d(pattern):
+def p_dt(pattern):
     (beats, beat_unit), bpm, notes = pattern
     acc = 0
     for note_group in notes:
@@ -109,15 +109,4 @@ def p_d(pattern):
             acc += note_duration
 
 
-if __name__ == '__main__':
-    Pattern = namedtuple('Pattern', ('sig', 'bpm', 'notes'))
-    pattern = Pattern((4, 4), 60, [[1, 1], [1], [1], [1]])
-    print(list(p_t(pattern)))
-    assert((list(p_t(pattern))) == [0, 500, 1000, 2000, 3000])
-    pattern = Pattern((4, 4), 60, [[1, 1, 1], [1], [1], [1]])
-    print(list(p_t(pattern)))
-    assert((list(p_t(pattern))) == [0, 333, 666, 1000, 2000, 3000])
-    pattern = Pattern((4, 4), 60, [[1, 1], [1, 1, 1], [1, 1], [1, 1, 1]])
-    print(list(p_t(pattern)))
-    assert((list(p_t(pattern))) ==
-           [0, 500, 1000, 1333, 1666, 2000, 2500, 3000, 3333, 3666])
+Pattern = namedtuple('Pattern', ('sig', 'bpm', 'notes'))
