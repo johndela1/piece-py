@@ -83,8 +83,8 @@ def easier(pattern, patterns):
             low = mid+1
 
 
-def p_tss(pattern):
-    (beats, beat_unit), bpm, notes = pattern
+def p_tss(pattern, bpm):
+    (beats, beat_unit), notes = pattern
     for i, note in enumerate(notes):
         subdivs = len(note)
         period = beat_unit*1000*SECS_PER_MIN / (bpm*beats)
@@ -96,8 +96,8 @@ def p_tss(pattern):
             ts += note_duration / subdivs
 
 
-def p_dts(pattern):
-    (beats, beat_unit), bpm, notes = pattern
+def p_dts(pattern, bpm):
+    (beats, beat_unit), notes = pattern
     acc = 0
     for note_group in notes:
         subdivs = len(note_group)
@@ -108,6 +108,3 @@ def p_dts(pattern):
                 acc = note_duration
                 continue
             acc += note_duration
-
-
-Pattern = namedtuple('Pattern', ('sig', 'bpm', 'notes'))

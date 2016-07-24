@@ -28,7 +28,8 @@ def play(deltas):
 
 if __name__ == '__main__':
     name = 'easy-4'
-    bpm = 120
+    name = '2-3'
+    bpm = 60
     deltas, note_count = service.deltas_with_note_count(name=name, bpm=bpm)
 
     play(deltas)

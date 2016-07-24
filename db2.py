@@ -9,6 +9,15 @@ engine = create_engine('sqlite:///samples.db', echo=False)
 Base = declarative_base()
 
 
+class Pattern(Base):
+    __tablename__ = 'pattern'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    notes = Column(String)
+    beats = Column(Integer)
+    beat_unit = Column(Integer)
+
+
 class Delta(Base):
     __tablename__ = 'delta'
     id = Column(Integer, primary_key=True)
@@ -33,10 +42,12 @@ class Extra(Base):
     ts = Column(Integer)
     attempt = relationship("Attempt", back_populates='extras')
 
-    
+
 class Attempt(Base):
     __tablename__ = 'attempt'
     id = Column(Integer, primary_key=True)
+    bpm = Column(Integer)
+    pattern_id = Column(Integer, ForeignKey('pattern.id'))
     deltas = relationship(
         "Delta", order_by=Delta.id, back_populates="attempt")
     extras = relationship(

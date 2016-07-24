@@ -1,8 +1,8 @@
 from itertools import chain
 
-from analyze import  Pattern, p_tss, p_dts
+from analyze import p_tss, p_dts
 import analyze
-from db2 import Delta, Extra, Miss, session
+from db2 import Delta, Extra, Miss, session, Pattern
 
 
 def write(a):
@@ -15,20 +15,20 @@ def write(a):
     session.flush()
 
 
-def get_pattern(name, bpm):
-    return Pattern((4, 4), bpm, [[1], [1], [1], [1]])
-
-
 def deltas_with_note_count(name, bpm):
-    pattern = get_pattern(name, bpm)
-    return p_dts(pattern), len(list(chain(*pattern.notes)))
+    pattern = session.query(Pattern).filter_by(name=name).one()
+    return (p_dts(((pattern.beats, pattern.beat_unit), eval(pattern.notes)), bpm),
+            len(list(chain(*(eval(pattern.notes))))))
 
 
 def submit(name, bpm, tss_in):
-    pattern = get_pattern(name, bpm)
-    tss_ref = p_tss(pattern)
+    pattern = session.query(Pattern).filter_by(name=name).one()
+    tss_ref = p_tss(((pattern.beats, pattern.beat_unit), eval(pattern.notes)), bpm)
     return analyze.analysis(tss_ref, tss_in)
 
 
+#session.add(Pattern(name='easy-4', beats=4, beat_unit=4, notes='[[1], [1], [1], [1]]'))
+#session.add(Pattern(name='2-3', beats=4, beat_unit=4, notes='[[1,1], [1,1,1]]'))
+#session.commit()
 if __name__ == '__main__':
     import pdb;pdb.set_trace()
