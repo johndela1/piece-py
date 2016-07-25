@@ -5,7 +5,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
 
-engine = create_engine('sqlite:///samples.db', echo=False)
+#engine = create_engine('sqlite:///samples.db', echo=False)
+engine = create_engine('postgresql+psycopg2://john@127.0.0.1/notes')
+
 Base = declarative_base()
 
 
