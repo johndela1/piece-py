@@ -2,7 +2,7 @@ from itertools import chain
 
 from analyze import p_tss, p_dts, trial
 import analyze
-from db2 import Delta, Extra, Miss, session, Pattern, Attempt
+from model import Delta, Extra, Miss, session, Pattern, Attempt
 
 
 def write(analysis, name, bpm):
