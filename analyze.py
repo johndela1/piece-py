@@ -60,7 +60,7 @@ def analysis(tss_ref, tss_in):
 
 def trial(tss_ref, tss_in):
     return (len(tss_ref) == len(tss_in) and
-        not any(map(lambda x: abs(x) > TOLERANCE,
+        all(map(lambda x: abs(x) <= TOLERANCE,
                 [ts_ref - ts_in for ts_ref, ts_in in zip(tss_ref, tss_in)])))
 
 
