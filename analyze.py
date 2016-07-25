@@ -55,7 +55,13 @@ def analysis(tss_ref, tss_in):
         else:
             deltas.append((ts_ref, (ts_in - ts_ref)))
             tss_in_remaining.remove(ts_in)
-    return dict(deltas=deltas, misses=missing, extras=tss_in_remaining)
+
+    return dict(
+        deltas=deltas,
+        misses=missing,
+        extras=tss_in_remaining,
+        result=not tss_in_remaining and not missing,
+        )
 
 
 def trial(tss_ref, tss_in):

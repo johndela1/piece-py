@@ -29,7 +29,7 @@ def submit(name, bpm, tss_in):
     tss_ref = p_tss(((p.beats, p.beat_unit), eval(p.notes)), bpm)
     analysis = analyze.analysis(tss_ref, tss_in)
     write(analysis, name, bpm)
-    return analysis, trial(tss_ref, tss_in)
+    return analysis
 
 
 if not session.query(Pattern).first():
