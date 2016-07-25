@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    create_engine, String, Integer, Column, ForeignKey)
+    create_engine, String, Integer, Column, ForeignKey, DateTime, Boolean)
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -56,7 +56,8 @@ class Attempt(Base):
         "Extra", order_by=Extra.id, back_populates="attempt")
     misses = relationship(
         "Miss", order_by=Miss.id, back_populates="attempt")
-
+    result = Column(Boolean)
+    created = Column(DateTime, server_default='now()')
 
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)

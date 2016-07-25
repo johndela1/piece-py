@@ -11,6 +11,7 @@ def write(analysis, name, bpm):
             deltas=[Delta(ts=ts, val=val) for ts, val in analysis['deltas']],
             extras=[Extra(ts=ts) for ts in analysis['extras']],
             misses=[Miss(ts=ts) for ts in analysis['misses']],
+            result=analysis['result'],
             pattern_id=session.query(Pattern).filter_by(name=name).one().id,
             bpm=bpm,
             )
