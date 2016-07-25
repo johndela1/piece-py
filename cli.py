@@ -12,13 +12,13 @@ def get_tss_in(n):
     tss = []
     for e in dev.read_loop():
         if x >= n:
-            return tss
+            break
         if e.type == ecodes.EV_KEY and e.value == 1:
             if base == None:
                 base = e.timestamp()
             x += 1
             tss.append(int((e.timestamp()-base)*PRE_SCALER))
-
+    return tss
 
 def play(deltas):
     for dt in deltas:
