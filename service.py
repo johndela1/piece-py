@@ -1,6 +1,6 @@
 from itertools import chain
 
-from analyze import p_tss, p_dts
+from analyze import p_tss, p_dts, trial
 import analyze
 from db2 import Delta, Extra, Miss, session, Pattern, Attempt
 
@@ -25,11 +25,11 @@ def deltas_with_note_count(name, bpm):
 
 
 def submit(name, bpm, tss_in):
-    pattern = session.query(Pattern).filter_by(name=name).one()
-    tss_ref = p_tss(((pattern.beats, pattern.beat_unit), eval(pattern.notes)), bpm)
+    p = session.query(Pattern).filter_by(name=name).one()
+    tss_ref = p_tss(((p.beats, p.beat_unit), eval(p.notes)), bpm)
     analysis = analyze.analysis(tss_ref, tss_in)
     write(analysis, name, bpm)
-    print(analysis)
+    return analysis, trial(tss_ref, tss_in)
 
 
 if not session.query(Pattern).first():
