@@ -47,7 +47,7 @@ def good_match(ts, tss):
 def analysis(tss_ref, tss_in):
     deltas = []
     missing = []
-    tss_in_remaining = copy(tss_in)
+    tss_in_remaining = list(tss_in)
     for ts_ref in tss_ref:
         ts_in = good_match(ts_ref, tss_in_remaining)
         if ts_in is None:
