@@ -19,15 +19,20 @@ def write(analysis, name, bpm):
     session.commit()
 
 
-def deltas_with_note_count(name, bpm):
+def get_pattern(name):
     p = session.query(Pattern).filter_by(name=name).one()
-    return (p_dts(((p.beats, p.beat_unit), eval(p.notes)), bpm),
+    return ((p.beats, p.beat_unit), eval(p.notes))
+
+
+def deltas_with_note_count(name, bpm):
+    pattern = get_pattern(name)
+    return (p_dts(pattern, bpm),
             len(list(chain(*(eval(p.notes))))))
 
 
 def submit(name, bpm, tss_in):
-    p = session.query(Pattern).filter_by(name=name).one()
-    tss_ref = p_tss(((p.beats, p.beat_unit), eval(p.notes)), bpm)
+    pattern = get_pattern(name)
+    tss_ref = p_tss(pattern, bpm)
     analysis = analyze.analysis(tss_ref, tss_in)
     write(analysis, name, bpm)
     return analysis
