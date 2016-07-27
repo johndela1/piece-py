@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from cmath import isclose
-
+import operator
 
 SECS_PER_MIN = 60
 TOLERANCE = 80
@@ -41,12 +41,14 @@ def analysis(tss_ref, tss_in):
 
 
 def trial(tss_ref, tss_in):
-    return (len(tss_ref) == len(tss_in) and
-        all(map(lambda x: abs(x) <= TOLERANCE,
-                [ts_ref - ts_in for ts_ref, ts_in in zip(tss_ref, tss_in)])))
+    if len(tss_ref) != len(tss_in):
+        return False
 
+    def in_tolerance(x):
+        return abs(x) <= TOLERANCE
 
-##########################################
+    deltas = map(operator.sub, tss_ref, tss_in)
+    return all(map(in_tolerance, deltas))
 
 
 def easier(pattern, patterns):
