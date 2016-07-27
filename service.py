@@ -26,8 +26,9 @@ def get_pattern(name):
 
 def deltas_with_note_count(name, bpm):
     pattern = get_pattern(name)
-    return (p_dts(pattern, bpm),
-            len(list(chain(*(eval(p.notes))))))
+    note_count = len(list(chain(*pattern[1])))
+    deltas = p_dts(pattern, bpm)
+    return (deltas, note_count)
 
 
 def submit(name, bpm, tss_in):
@@ -39,8 +40,18 @@ def submit(name, bpm, tss_in):
 
 
 if not session.query(Pattern).first():
-    session.add(Pattern(name='easy-4', beats=4, beat_unit=4, notes='[[1], [1], [1], [1]]'))
-    session.add(Pattern(name='2-3', beats=4, beat_unit=4, notes='[[1,1], [1,1,1]]'))
+    session.add(
+        Pattern(
+            name='easy-4',
+            beats=4, beat_unit=4,
+            notes='[[1], [1], [1], [1]]',
+            )
+        )
+    session.add(
+        Pattern(
+            name='2-3',
+            beats=4, beat_unit=4,
+            notes='[[1,1], [1,1,1]]',
+            )
+         )
     session.commit()
-if __name__ == '__main__':
-    import pdb;pdb.set_trace()
