@@ -1,16 +1,10 @@
 #!/usr/bin/python
 
 from cmath import isclose
-from collections import namedtuple
-from copy import copy
 from itertools import accumulate
 
 SECS_PER_MIN = 60
 TOLERANCE = 80
-
-
-def deltas_tss(deltas):
-    yield from accumulate(deltas)
 
 
 def bpm_bps(bpm):
@@ -36,7 +30,7 @@ def pattern_deltas(pattern, bpm):
 
 
 def pattern_tss(pattern, bpm):
-    return deltas_tss(pattern_deltas(pattern, bpm))
+    return accumulate(pattern_deltas(pattern, bpm))
 
 
 def good_match(ts, tss):
