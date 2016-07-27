@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from cmath import isclose
-from itertools import accumulate
+
 
 SECS_PER_MIN = 60
 TOLERANCE = 80
@@ -13,24 +13,6 @@ def bpm_bps(bpm):
 
 def secs_millis(t):
     return t * 1000
-
-
-def pattern_deltas(pattern, bpm):
-    (beats, beat_unit), notes = pattern
-    note_duration = int(secs_millis(beat_unit / beats) / bpm_bps(bpm))
-    acc = 0
-    deltas = []
-    for note in notes:
-        if note:
-            deltas.append(acc)	
-            acc = note_duration
-        else:
-            acc += note_duration
-    return deltas
-
-
-def pattern_tss(pattern, bpm):
-    return accumulate(pattern_deltas(pattern, bpm))
 
 
 def good_match(ts, tss):
