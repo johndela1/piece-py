@@ -1,6 +1,6 @@
 from time import sleep
 from evdev import InputDevice, ecodes
-
+from pprint import pprint as pp
 import service
 
 PRE_SCALER = 1000
@@ -35,8 +35,5 @@ if __name__ == '__main__':
     deltas, note_count = service.deltas_with_note_count(name=name, bpm=bpm)
     play(deltas)
     tss_in = get_tss_in(note_count)
-
     analysis = service.submit(name, bpm, tss_in)
-
-    print('result:', analysis['result'])
-    print(analysis)
+    pp(analysis)
