@@ -2,6 +2,7 @@
 
 from cmath import isclose
 import operator
+from statistics import variance
 
 SECS_PER_MIN = 60
 TOLERANCE = 80
@@ -92,3 +93,8 @@ def p_dts(pattern, bpm):
                 acc = note_duration
                 continue
             acc += note_duration
+
+
+def total_err(deltas):
+    dts = [dt for _, dt in deltas]
+    return (sum(map(abs, dts)), variance(dts))

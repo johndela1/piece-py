@@ -1,6 +1,6 @@
 from itertools import chain
 
-from analyze import p_tss, p_dts, trial
+from analyze import p_tss, p_dts, trial, total_err
 import analyze
 from model import Delta, Extra, Miss, session, Pattern, Attempt
 
