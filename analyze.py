@@ -40,6 +40,21 @@ def analysis(tss_ref, tss_in):
         result=not tss_in_remaining and not missing,
         )
 
+def analysis2(tss_ref, tss_in):
+    def to_deltas(tss):
+        return [(t1 - t0) for t0, t1 in zip(tss, tss[1:])]
+
+    def deltas_diff(dts1, dts2):
+        return [(x - y) for x, y in zip(dts1, dts2)]
+
+    deltas_ref = to_deltas(tss_ref)
+    deltas_in = to_deltas(tss_in)
+    return deltas_diff(deltas_ref, deltas_in)
+
+
+x = analysis2([100,200,300,400,500],[100,206,306, 406, 506])
+print(x)
+
 
 def trial(tss_ref, tss_in):
     if len(tss_ref) != len(tss_in):
