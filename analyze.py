@@ -21,49 +21,49 @@ def good_match(ts, tss):
         (x for x in tss if isclose(ts, x, abs_tol=TOLERANCE)), None)
 
 
-def analysis(tss_ref, tss_in):
+def analysis(ref_tssref, in_tss):
     deltas = []
     missing = []
-    tss_in_remaining = list(tss_in)
-    for ts_ref in tss_ref:
-        ts_in = good_match(ts_ref, tss_in_remaining)
-        if ts_in is None:
-            missing.append(ts_ref)
+    remaining_in_tss = list(in_tss)
+    for ref_rs in ref_tss:
+        ts_in = good_match(ref_ts, remaining_in_tss)
+        if in_ts is None:
+            missing.append(ref_ts)
         else:
-            deltas.append((ts_ref, (ts_in - ts_ref)))
-            tss_in_remaining.remove(ts_in)
+            deltas.append((ref_ts, (in_ts - ref_ts)))
+            remaining_in_tss.remove(in_ts)
 
     return dict(
         deltas=deltas,
         misses=missing,
-        extras=tss_in_remaining,
-        result=not tss_in_remaining and not missing,
+        extras=remaining_in_tss,
+        result=not extras and not missing,
         )
 
-def analysis2(tss_ref, tss_in):
+def analysis2(ref_tss, in_tss):
     def to_deltas(tss):
         return [(t1 - t0) for t0, t1 in zip(tss, tss[1:])]
 
     def deltas_diff(dts1, dts2):
         return [(x - y) for x, y in zip(dts1, dts2)]
 
-    deltas_ref = to_deltas(tss_ref)
-    deltas_in = to_deltas(tss_in)
-    return deltas_diff(deltas_ref, deltas_in)
+    ref_deltas = to_deltas(ref_tss)
+    in_deltas = to_deltas(in_tss)
+    return deltas_diff(ref_deltas, in_deltas)
 
 
 x = analysis2([100,200,300,400,500],[100,206,306, 406, 506])
 print(x)
 
 
-def trial(tss_ref, tss_in):
-    if len(tss_ref) != len(tss_in):
+def trial(ref_tss, in_tss):
+    if len(ref_tss) != len(in_tss):
         return False
 
     def in_tolerance(x):
         return abs(x) <= TOLERANCE
 
-    deltas = map(operator.sub, tss_ref, tss_in)
+    deltas = map(operator.sub, ref_tss, in_tss)
     return all(map(in_tolerance, deltas))
 
 
@@ -86,23 +86,23 @@ def easier(pattern, patterns):
 def p_tss(pattern, bpm):
     (beats, beat_unit), notes = pattern
     for i, note in enumerate(notes):
-        subdivs = len(note)
+        sub_divs = len(note)
         period = beat_unit*1000*SECS_PER_MIN / (bpm*beats)
         note_duration = int(secs_millis(beat_unit / beats) / bpm_bps(bpm))
         assert  period == note_duration
         ts = i * secs_millis((beats / bpm_bps(bpm)) / beat_unit)
-        for sub in range(subdivs):
+        for sub in range(sub_divs):
             if note[sub]: yield int(ts)
-            ts += note_duration / subdivs
+            ts += note_duration / sub_divs
 
 
 def p_dts(pattern, bpm):
     (beats, beat_unit), notes = pattern
     acc = 0
     for note_group in notes:
-        subdivs = len(note_group)
-        note_duration = secs_millis(SECS_PER_MIN / bpm) / subdivs
-        for sub in range(subdivs):
+        sub_divs = len(note_group)
+        note_duration = secs_millis(SECS_PER_MIN / bpm) / sub_divs
+        for sub in range(sub_divs):
             if note_group[sub]:
                 yield acc
                 acc = note_duration
