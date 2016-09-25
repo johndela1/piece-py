@@ -1,4 +1,5 @@
 from itertools import chain
+import json
 
 from analyze import p_tss, p_dts, trial, total_err
 import analyze
@@ -55,3 +56,16 @@ if not session.query(Pattern).first():
             )
          )
     session.commit()
+
+
+if __name__ == '__main__':
+    import socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(("127.0.0.1", 8001))
+    while True:
+        data, addr = sock.recvfrom(1024)
+        name = data.decode('utf8').rstrip('\0')
+        print("pname", name)
+        res = json.dumps(deltas_with_note_count(name, 60))
+        print("res", res)
+        sock.sendto(res.encode(), addr)
