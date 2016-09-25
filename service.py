@@ -27,7 +27,7 @@ def get_pattern(name):
 def deltas_with_note_count(name, bpm):
     pattern = get_pattern(name)
     note_count = len(list(chain(*pattern[1])))
-    deltas = p_dts(pattern, bpm)
+    deltas = [i for i in p_dts(pattern, bpm)]
     return (deltas, note_count)
 
 
