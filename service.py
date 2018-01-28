@@ -1,7 +1,7 @@
 from itertools import chain
 import json
 
-from analyze import p_tss, p_dts, trial, total_err
+from analyze import p_tss, p_dts, trial, err_sum
 import analyze
 from model import Delta, Extra, Miss, session, Pattern, Attempt
 

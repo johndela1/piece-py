@@ -110,6 +110,6 @@ def p_dts(pattern, bpm):
             acc += note_duration
 
 
-def total_err(deltas):
+def err_sum(deltas):
     dts = [dt for _, dt in deltas]
     return (sum(map(abs, dts)), variance(dts))

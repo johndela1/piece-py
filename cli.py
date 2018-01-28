@@ -38,4 +38,4 @@ if __name__ == '__main__':
     analysis = service.submit(name, bpm, tss_in)
     pp(analysis)
     if (analysis['result']):
-        pp(service.total_err(analysis['deltas']))
+        pp(service.err_sum(analysis['deltas']))
